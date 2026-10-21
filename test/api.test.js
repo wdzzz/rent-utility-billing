@@ -682,7 +682,17 @@ test('HTTPS 反向代理：X-Forwarded-Proto=https 时 Cookie 加 Secure 并返�
   assert.equal(plain.headers.get('strict-transport-security'), null);
 });
 
-test('公开近期费用查询：最近 6 份账单，只含房号与金额', async () => {
+test('公开近期费用查询：最近 6 份账单，含房号/金额/离住记录', async () => {
+  // 先给 201 张伟登记一段离住，验证公开账单里能带出离住记录
+  const rooms = (await req('GET', '/api/rooms')).data.rooms;
+  const tenant201 = rooms.find((r) => r.room_no === '201').tenants[0];
+  const absence = await req('POST', `/api/tenants/${tenant201.id}/absences`, {
+    start_date: '2026-09-05',
+    end_date: '2026-09-08',
+    note: '回老家',
+  });
+  assert.equal(absence.status, 200);
+
   const created = [];
   for (let i = 0; i < 4; i += 1) {
     const res = await req('POST', '/api/bills', {
@@ -711,10 +721,23 @@ test('公开近期费用查询：最近 6 份账单，只含房号与金额', as
       bill.rooms.reduce((a, r) => a + r.amount_cents, 0),
       bill.total_cents
     );
-    assert.deepEqual(Object.keys(bill.rooms[0]).sort(), ['amount_cents', 'room_no']);
+    assert.deepEqual(Object.keys(bill.rooms[0]).sort(), ['absences', 'amount_cents', 'room_no']);
   }
+  // 201 房带出张伟的离住记录（姓名 + 日期 + 天数）
+  const room201 = payload.bills
+    .flatMap((b) => b.rooms)
+    .find((r) => r.room_no === '201' && (r.absences || []).length);
+  assert.ok(room201, '公开账单包含离住记录');
+  assert.deepEqual(room201.absences[0], {
+    name: '张伟',
+    start: '2026-09-05',
+    end: '2026-09-08',
+    days: 4,
+    note: '回老家',
+  });
+
   const rawText = JSON.stringify(payload);
-  assert.doesNotMatch(rawText, /tenants|tenant_name|phone|id_card/);
+  assert.doesNotMatch(rawText, /tenants|tenant_name|phone|id_card|share_cents/);
 
   // 公开页面上能看到这个区块
   const page = await fetch(BASE + '/absence');
@@ -722,4 +745,5 @@ test('公开近期费用查询：最近 6 份账单，只含房号与金额', as
   assert.match(await page.text(), /近期费用查询/);
 
   for (const bill of created) await req('DELETE', `/api/bills/${bill.id}`);
+  await req('DELETE', `/api/absences/${absence.data.id}`);
 });

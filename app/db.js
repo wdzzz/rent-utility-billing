@@ -628,11 +628,32 @@ class Store {
       )
       .all(n);
     const itemsStmt = this.db.prepare(
-      `SELECT room_no, amount_cents FROM bill_items WHERE bill_id = ? ORDER BY seq, id`
+      `SELECT room_no, amount_cents, tenants_json FROM bill_items WHERE bill_id = ? ORDER BY seq, id`
     );
     return bills.map((b) => ({
       ...b,
-      rooms: itemsStmt.all(b.id).map((i) => ({ room_no: i.room_no, amount_cents: i.amount_cents })),
+      rooms: itemsStmt.all(b.id).map((i) => {
+        // 只取「姓名 + 离住日期 + 天数」，不含电话/身份证/分摊金额
+        const absences = [];
+        for (const t of safeJson(i.tenants_json, [])) {
+          const list = Array.isArray(t.absences) ? t.absences : [];
+          if (list.length) {
+            for (const a of list) {
+              absences.push({
+                name: t.name,
+                start: a.start,
+                end: a.end,
+                days: a.days,
+                note: a.note || '',
+              });
+            }
+          } else if (t.absence_days > 0) {
+            // 兼容旧账单（当时未保存具体日期）
+            absences.push({ name: t.name, start: null, end: null, days: t.absence_days, note: '' });
+          }
+        }
+        return { room_no: i.room_no, amount_cents: i.amount_cents, absences };
+      }),
     }));
   }
 

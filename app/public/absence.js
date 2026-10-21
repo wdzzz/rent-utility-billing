@@ -14,6 +14,23 @@ function escapeHtml(v) {
     .replace(/'/g, '&#39;');
 }
 
+function shortDate(d) {
+  return d ? String(d).slice(5) : '';
+}
+
+function absenceText(room) {
+  const list = room.absences || [];
+  if (!list.length) return '<span class="muted">无离住记录</span>';
+  return list
+    .map((a) => {
+      const range = a.start ? `${shortDate(a.start)} ~ ${shortDate(a.end)}` : '回老家';
+      return `<span class="chip gray">${escapeHtml(a.name)}：${range}（${a.days}天）${
+        a.note ? ' ' + escapeHtml(a.note) : ''
+      }</span>`;
+    })
+    .join(' ');
+}
+
 function yuan(cents) {
   return (Number(cents || 0) / 100).toLocaleString('zh-CN', {
     minimumFractionDigits: 2,
@@ -125,17 +142,20 @@ function renderBills(bills) {
           <span class="pb-total">¥ ${yuan(b.total_cents)}</span>
         </summary>
         <table class="data-table">
-          <thead><tr><th>房号</th><th class="num">金额(元)</th></tr></thead>
+          <thead><tr><th>房号</th><th class="num">金额(元)</th><th>离住记录（本期间）</th></tr></thead>
           <tbody>${
             b.rooms
               .map(
-                (r) => `<tr><td>${escapeHtml(r.room_no)}</td><td class="num">${yuan(
-                  r.amount_cents
-                )}</td></tr>`
+                (r) => `<tr>
+                  <td class="room-cell">${escapeHtml(r.room_no)}</td>
+                  <td class="num">${yuan(r.amount_cents)}</td>
+                  <td>${absenceText(r)}</td>
+                </tr>`
               )
-              .join('') || '<tr><td colspan="2" class="muted">暂无房间明细</td></tr>'
+              .join('') || '<tr><td colspan="3" class="muted">暂无房间明细</td></tr>'
           }</tbody>
         </table>
+        <p class="hint">离住记录仅显示姓名与日期，方便核对扣减天数；不包含电话、身份证等信息。</p>
         <p class="hint">状态：${b.status === 'draft' ? '草稿' : '已确认'} · 生成时间 ${escapeHtml(
           b.created_at || ''
         )}</p>
