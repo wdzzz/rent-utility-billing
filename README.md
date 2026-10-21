@@ -40,12 +40,13 @@
 ```bash
 git clone https://github.com/wdzzz/rent-utility-billing.git
 cd rent-utility-billing
-node -v                 # 需要 Node >= 22.5（推荐 24，内置 node:sqlite）
-./scripts/start.sh      # 后台启动：http://localhost:8787
+cp .env.example .env        # 按需改 PUID/PGID（宿主机 id -u / id -g）
+docker compose up -d --build
 ```
 
-第一次打开网页会要求**设置访问密码**；`./scripts/stop.sh` 停止，`./scripts/status.sh` 看状态。
-运行时**零第三方依赖**，不需要 `npm install`；跑测试用 `npm test`。
+打开 http://localhost:8787 ，第一次会要求**设置访问密码**。
+`./scripts/start.sh` / `./scripts/stop.sh` / `./scripts/status.sh` 管理容器，数据在 `./data`。
+运行时**零第三方依赖**（Node 24 + node:sqlite），不需要 `npm install`；跑测试用 `npm test`。
 
 ## 界面预览
 
@@ -186,101 +187,125 @@ node -v                 # 需要 Node >= 22.5（推荐 24，内置 node:sqlite�
 
 ---
 
-## 三、本地运行
+## 三、部署（Docker，推荐）
 
 要求 Node.js **>= 22.5**（推荐 24，`node:sqlite` 已内置且无需实验开关）。
 
 > 第一次打开 http://localhost:8787 会要求**设置访问密码**（至少 4 位，短密码即可），
 > 设置后以后进入系统都要输入；忘记密码见文末常见问题。
 
-### 方式一：后台常驻（推荐，脚本管理）
+### 1. 准备环境
+
+需要 Docker（含 Compose v2）。复制配置并按宿主机用户改一下：
 
 ```bash
-./scripts/start.sh     # 启动（脱离终端后台运行，默认 0.0.0.0:8787）
-./scripts/status.sh    # 查看进程、健康检查、日志
-./scripts/stop.sh      # 停止
+cp .env.example .env
+# 编辑 .env：
+#   PUID / PGID 填 `id -u` / `id -g` 的结果（保证 ./data 属主不变）
+#   IMAGE 先用本地构建的 rent-utility-billing:1.1.0
 ```
 
-启动成功会打印访问地址，例如：
-
-```
-启动成功（PID 12345）
-  本机访问：http://localhost:8787
-  局域网访问：http://192.168.1.200:8787
-```
-
-- 日志：`data/server.log`（持续追加）
-- PID：`data/server.pid`
-- 换端口：`PORT=9000 ./scripts/start.sh`
-- 只允许本机访问：`HOST=127.0.0.1 ./scripts/start.sh`
-
-### 方式二：前台运行（调试用）
+### 2. 构建并启动
 
 ```bash
-node app/server.js       # Ctrl+C 停止
+docker compose up -d --build     # 首次构建镜像（约 1~2 分钟，零依赖、无需 npm install）
+./scripts/start.sh               # 日常启动（幂等，已在跑就什么都不做）
+./scripts/status.sh              # 容器状态 + 健康检查 + 日志
+./scripts/stop.sh                # 停止并移除容器（数据保留）
 ```
 
-打开 <http://localhost:8787> 即可（同一局域网用 `http://NAS的IP:8787`）。
+打开 <http://localhost:8787>（局域网用 `http://NAS的IP:8787`），第一次会要求设置访问密码。
 
-### 开机自启（可选）
+- 数据在宿主机 `./data`（容器内 `/data`），**删容器不丢账**
+- 容器用 `.env` 里的 `PUID/PGID` 运行，`./data` 属主不会被改
+- 自带 `HEALTHCHECK`，`docker compose ps` 能看到 `(healthy)`
+- 网络受限拉不到 `node:24-alpine` 时：
+  `docker compose build --build-arg BASE_IMAGE=docker.m.daocloud.io/library/node:24-alpine`
+
+### 3. 代码更新后
 
 ```bash
-./scripts/install-autostart.sh     # 写入用户 crontab：开机启动 + 每 5 分钟存活检查
+docker compose up -d --build
+```
+
+### 4. 直接 node 运行（开发调试用，可选）
+
+```bash
+node app/server.js               # 前台运行，Ctrl+C 停止
+PORT=9000 node app/server.js     # 换端口
+npm run dev                      # 改代码自动重启
+```
+
+### 5. 开机自启（可选）
+
+```bash
+./scripts/install-autostart.sh     # 写入用户 crontab：@reboot + 每 5 分钟检查容器
 ./scripts/uninstall-autostart.sh   # 取消
 ```
 
-### 备份 / 维护
+前提是 Docker 服务本身已设为开机启动（NAS 上一般是默认的）。
+
+### 6. 备份 / 维护
 
 ```bash
-./scripts/backup.sh      # 生成一致性快照到 data/backups/，保留最近 30 份（命令行备份）
-npm test                 # 42 个测试：计算逻辑对账 + 接口集成测试（含密码/备份/公开登记）
-npm run dev              # 改代码自动重启（node --watch）
-npm run reset            # 清空账单并恢复表格初始数据
+./scripts/backup.sh      # 一致性快照到 data/backups/，保留最近 30 份
+npm test                 # 43 个测试：计算逻辑对账 + 接口集成测试
+npm run reset            # 清空账单并恢复初始演示数据
 ```
 
 **网页上的备份 / 恢复**：右上角「设置」→ 下载备份文件（`.db`）/ 选择备份文件恢复。
 恢复前会自动把当前数据库备份到 `data/backups/pre-restore-*.db`，恢复后数据立即生效。
 
-可选环境变量：
+### 7. 环境变量
+
+Docker 部署改 `.env` 即可（`.env` 不提交到 Git）：
 
 | 变量 | 默认 | 说明 |
 | --- | --- | --- |
-| `PORT` | `8787` | 监听端口 |
-| `HOST` | `0.0.0.0` | 监听地址，只给本机用可设 `127.0.0.1` |
-| `DB_PATH` | `./data/billing.db` | 数据库文件位置 |
-| `APP_PASSWORD` | 空 | **仅测试/应急**用：未设置网页密码时作为兜底密码（正常请在网页上设置，密码哈希存在 `data/config.json`） |
-| `TRUST_PROXY` | 空 | 放在反向代理后面时设为 `1`：用 `X-Forwarded-For` 识别真实 IP（公开登记限流用） |
-| `TZ` | 系统时区 | 影响账单「创建时间」 |
+| `PUID` / `PGID` | `1000` | 容器运行用户，建议填宿主机 `id -u` / `id -g` |
+| `IMAGE` | `rent-utility-billing:1.1.0` | 镜像名；推送阿里云后改成仓库地址 |
+| `PORT` | `8787` | 映射到宿主机的端口 |
+| `TZ` | `Asia/Shanghai` | 时区 |
+| `TRUST_PROXY` | 空 | 放在反向代理后面时设 `1`（用 X-Forwarded-For 识别真实 IP） |
+| `APP_PASSWORD` | 空 | **仅测试/应急**：未设置网页密码时的兜底密码（正常在网页设置） |
+| `BASE_IMAGE` | `node:24-alpine` | 构建用基础镜像，网络受限时可换镜像站 |
 
-```bash
-# 应急：忘记密码时，也可以临时用环境变量密码启动
-APP_PASSWORD='临时密码' node app/server.js
-```
+直接 `node app/server.js` 时还支持 `PORT`、`HOST`、`DB_PATH`。
 
 ---
 
-## 四、Docker 部署（可选，当前用不上）
+## 四、阿里云容器镜像仓库（构建 / 推送）
 
-> 目前按「本地直接跑」部署，本节仅作备用。镜像构建时不需要 `npm install`（零依赖），所以很快。
+以阿里云「容器镜像服务」为例（经典版地址形如 `registry.cn-hangzhou.aliyuncs.com`，
+个人版形如 `crpi-xxxx.cn-beijing.personal.cr.aliyuncs.com`，以控制台显示的为准）：
 
 ```bash
-# 方式一：docker compose（推荐）
-docker compose up -d --build
+# 1) 登录（用户名/密码用「容器镜像服务」的固定密码，不是阿里云登录密码）
+docker login --username=<阿里云账号> registry.cn-hangzhou.aliyuncs.com
 
-# 方式二：手动构建
-docker build -t rent-utility-billing:1.0.0 .
-docker run -d --name rent-utility-billing \
-  -p 8787:8787 \
-  -v "$PWD/data:/data" \
-  -e TZ=Asia/Shanghai \
-  --restart unless-stopped \
-  rent-utility-billing:1.0.0
+# 2) 构建并打标签
+docker build -t rent-utility-billing:1.1.0 .
+docker tag rent-utility-billing:1.1.0 \
+  registry.cn-hangzhou.aliyuncs.com/<命名空间>/rent-utility-billing:1.1.0
+docker tag rent-utility-billing:1.1.0 \
+  registry.cn-hangzhou.aliyuncs.com/<命名空间>/rent-utility-billing:latest
+
+# 3) 推送
+docker push registry.cn-hangzhou.aliyuncs.com/<命名空间>/rent-utility-billing:1.1.0
+docker push registry.cn-hangzhou.aliyuncs.com/<命名空间>/rent-utility-billing:latest
 ```
 
-- 数据文件在容器的 `/data/billing.db`，compose 已挂载到宿主机 `./data`，**删容器不丢账**
-- 容器以 `node` 用户运行；启动脚本会把数据目录属主改成 `node` 后再降权
-- 自带 `HEALTHCHECK`，`docker ps` 可看到健康状态
-- 需要登录保护：在 `docker-compose.yml` 里取消 `APP_USER` / `APP_PASSWORD` 注释
+推送完成后，把本地部署改成从镜像仓库拉取：
+
+```bash
+# 编辑 .env：
+# IMAGE=registry.cn-hangzhou.aliyuncs.com/<命名空间>/rent-utility-billing:1.1.0
+
+docker compose pull
+docker compose up -d
+```
+
+> 镜像基于 `node:24-alpine`，约 170MB；运行时零第三方依赖。
 
 ---
 

@@ -1,20 +1,28 @@
+name: rent-utility-billing
+
 services:
   billing:
+    image: ${IMAGE:-rent-utility-billing:1.1.0}
     build:
       context: .
       dockerfile: Dockerfile
-    image: rent-utility-billing:1.0.0
+      args:
+        # 网络受限时可在 .env 里改成镜像站前缀，如 docker.m.daocloud.io/library/node:24-alpine
+        BASE_IMAGE: ${BASE_IMAGE:-node:24-alpine}
     container_name: rent-utility-billing
     restart: unless-stopped
     ports:
-      - "8787:8787"
+      - "${PORT:-8787}:8787"
     environment:
-      TZ: Asia/Shanghai
-      # 需要密码保护时取消下面两行注释（浏览器会弹出登录框）
-      # APP_USER: admin
-      # APP_PASSWORD: change-me
+      TZ: ${TZ:-Asia/Shanghai}
+      # 放在 Nginx/Caddy 后面时设为 1，用 X-Forwarded-For 识别真实 IP
+      TRUST_PROXY: ${TRUST_PROXY:-}
+      # 应急兜底密码（正常请在网页「设置」里设置访问密码，密码存 ./data/config.json）
+      APP_PASSWORD: ${APP_PASSWORD:-}
+    # 用宿主机当前用户的 uid/gid 运行，./data 目录不会被容器改成别的属主
+    user: "${PUID:-1000}:${PGID:-1000}"
     volumes:
-      # 账单数据库保存在宿主机 ./data 目录，删容器不丢数据
+      # 数据库、密码配置、备份都保存在宿主机 ./data，删容器不丢数据
       - ./data:/data
     healthcheck:
       test:

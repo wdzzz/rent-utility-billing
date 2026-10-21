@@ -1,8 +1,8 @@
-# syntax=docker/dockerfile:1
-
 # 房租水电费计算 —— 运行时零第三方依赖（Node 内置 http + node:sqlite），
 # 因此镜像很小，也不需要在构建时 npm install。
-FROM node:24-alpine
+# 基础镜像默认用官方 node:24-alpine；网络受限时可用 --build-arg BASE_IMAGE=镜像源/library/node:24-alpine 指定镜像站
+ARG BASE_IMAGE=node:24-alpine
+FROM ${BASE_IMAGE}
 
 LABEL org.opencontainers.image.title="房租水电费计算" \
       org.opencontainers.image.description="本地水电费分摊计算服务（按房间系数分摊，历史账单）" \
@@ -22,7 +22,9 @@ COPY package.json ./
 COPY app ./app
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
 
-RUN chmod +x /usr/local/bin/entrypoint.sh \
+# 宿主机文件权限可能是 711/600，统一补上可读/可执行，避免容器以非 root 运行时打不开
+RUN chmod 755 /usr/local/bin/entrypoint.sh \
+ && chmod -R a+rX /app \
  && mkdir -p /data \
  && chown -R node:node /app /data
 
