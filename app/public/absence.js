@@ -141,7 +141,7 @@ function renderBills(bills) {
           <span class="pb-period">${escapeHtml(b.period_start)} ~ ${escapeHtml(b.period_end)}</span>
           <span class="pb-total">¥ ${yuan(b.total_cents)}</span>
         </summary>
-        <table class="data-table">
+        <table class="data-table bill-rooms-table">
           <thead><tr><th>房号</th><th class="num">金额(元)</th><th>离住记录（本期间）</th></tr></thead>
           <tbody>${
             b.rooms

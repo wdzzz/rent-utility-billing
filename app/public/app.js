@@ -487,7 +487,7 @@ function openAbsenceModal(tenant) {
     }
     $('#absence-list').innerHTML = `
       <div class="table-wrap">
-        <table class="data-table" style="min-width:520px">
+        <table class="data-table abs-modal-table">
           <thead><tr><th>开始</th><th>结束</th><th class="num">天数</th><th>备注</th><th>操作</th></tr></thead>
           <tbody>${list
             .map(
@@ -776,7 +776,7 @@ function renderFeeTable(fee, opts = {}) {
   )} · 单价 ${fee.weight_sum > 0 ? fmtUnitPrice(fee.unit_price) + ' 元/单位' : '—'}</span>
     </div>
     <div class="table-wrap">
-      <table class="data-table">
+      <table class="data-table fee-table">
         <thead><tr>
           <th>房号</th><th class="num">${dayLabel}</th><th class="num">${escapeHtml(
     fee.name

@@ -491,3 +491,89 @@ main { max-width: 1240px; margin: 0 auto; padding: 20px 22px 60px; }
 .pb-total { margin-left: auto; font-weight: 700; font-size: 13.5px; }
 .public-bill .data-table { margin-top: 10px; width: 100%; }
 .public-bill .hint { display: block; margin: 8px 0 0; }
+
+/* ---------- 手机端表格优化 ---------- */
+/* 单元格不逐字换行，超出就横向滑动查看，避免行高被撑爆 */
+.data-table td { white-space: nowrap; }
+.data-table td .chip { white-space: normal; }
+@media (max-width: 900px) {
+  .data-table { font-size: 13px; }
+  .data-table th,
+  .data-table td { padding: 8px 10px; }
+  .table-wrap { -webkit-overflow-scrolling: touch; }
+}
+@media (max-width: 560px) {
+  .data-table { font-size: 12.5px; min-width: 560px; }
+  .data-table th,
+  .data-table td { padding: 7px 8px; }
+  /* 列少的表格直接铺满手机宽度，不需要滑动 */
+  .data-table.summary-table,
+  .data-table.bill-rooms-table,
+  .data-table.abs-modal-table { min-width: 0; }
+}
+
+@media (max-width: 900px) {
+  /* 页面本身不横向滚动，宽表格在自己的容器里滑动 */
+  body { overflow-x: hidden; }
+}
+
+/* 手机端分摊表：隐藏「权重」列，4 列直接铺满，不用左右滑动 */
+@media (max-width: 560px) {
+  .data-table.fee-table { min-width: 0; }
+  .data-table.fee-table th:nth-child(3),
+  .data-table.fee-table td:nth-child(3) { display: none; }
+  .data-table.fee-table th:last-child,
+  .data-table.fee-table td:last-child { white-space: normal; }
+}
+
+/* 手机端精简列：隐藏身份证、创建时间等次要列，减少左右滑动 */
+@media (max-width: 560px) {
+  #tenants-table th:nth-child(4),
+  #tenants-table td:nth-child(4) { display: none; }
+  #bills-table th:nth-child(6),
+  #bills-table td:nth-child(6) { display: none; }
+}
+
+/* 手机端顶栏：品牌 + 设置同一行，标签栏独占一行 */
+@media (max-width: 900px) {
+  .topbar { display: grid; grid-template-columns: 1fr auto; align-items: center; row-gap: 10px; }
+  .brand { min-width: 0; }
+  .topbar-actions { grid-column: 2; justify-self: end; }
+  .tabs { grid-column: 1 / -1; }
+}
+
+/* 手机端进一步精简列，让金额/操作不用滑动就能看到 */
+@media (max-width: 560px) {
+  #bills-table th:nth-child(3),
+  #bills-table td:nth-child(3) { display: none; } /* 计费期间 */
+  #absences-table th:nth-child(6),
+  #absences-table td:nth-child(6) { display: none; } /* 备注 */
+  #rooms-table th:nth-child(6),
+  #rooms-table td:nth-child(6) { display: none; } /* 备注 */
+  #tenants-table th:nth-child(6),
+  #tenants-table td:nth-child(6) { display: none; } /* 退租日期 */
+}
+
+@media (max-width: 900px) {
+  .brand { grid-row: 1; grid-column: 1; }
+  .topbar-actions { grid-row: 1; grid-column: 2; }
+  .tabs { grid-row: 2; grid-column: 1 / -1; }
+}
+
+@media (max-width: 560px) {
+  #bills-table th:nth-child(5),
+  #bills-table td:nth-child(5) { display: none; } /* 状态（详情里有） */
+  #bills-table th:last-child,
+  #bills-table td:last-child { white-space: normal; }
+}
+
+@media (max-width: 560px) {
+  #bills-table { min-width: 0; }
+}
+
+@media (max-width: 560px) {
+  #bills-table td:last-child .btn-link { white-space: nowrap; }
+}
+
+/* 备注类文本允许换行（其余单元格保持单行，避免手机端行高异常） */
+.data-table td.muted { white-space: normal; }
