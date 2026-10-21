@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>房租水电费计算</title>
+  <link rel="stylesheet" href="style.css?v=20261021g" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-icon" aria-hidden="true">
+        <svg viewBox="0 0 40 40" role="img" aria-label="房租水电费计算">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/>
+      <stop offset="0.52" stop-color="#111c33"/>
+      <stop offset="1" stop-color="#1f2a5e"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="0.45" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a5f3fc"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.22" cy="0.12" r="0.9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.6" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="11" fill="url(#tile)"/>
+  <rect width="40" height="40" rx="11" fill="url(#glow)"/>
+  <rect x="0.6" y="0.6" width="38.8" height="38.8" rx="10.5" fill="none" stroke="url(#edge)" stroke-width="0.8"/>
+  <path d="M8.6 19.6 20 9.8l11.4 9.8" fill="none" stroke="#eef3ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.4 19.6v10.6M28.6 19.6v10.6M11.4 30.2h17.2" fill="none" stroke="#c9d6f2" stroke-width="1.7" stroke-linecap="round" opacity="0.72"/>
+  <path transform="translate(0.4 0)" d="M21.3 14.3 15.9 21.6h3.4l-1.4 5.4 5.6-8.1h-3.5l1.3-4.6z" fill="url(#bolt)"/>
+  <path transform="translate(0.4 0.3)" d="M28.9 22.1c2.2 2.9 3.2 4.7 3.2 6a3.2 3.2 0 0 1-6.4 0c0-1.3 1-3.1 3.2-6z" fill="url(#drop)"/>
+        </svg>
+      </span>
+      <div>
+        <h1>房租水电费计算</h1>
+        <p class="sub">按房间系数分摊 · 本地运行 · 数据存本地</p>
+      </div>
+    </div>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-view="new">新建账单</button>
+      <button class="tab" data-view="bills">历史账单</button>
+      <button class="tab" data-view="rooms">房间与人员</button>
+      <button class="tab" data-view="absences">离住记录</button>
+    </nav>
+    <div class="topbar-actions">
+      <button class="btn ghost small" id="btn-settings">设置</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ 新建账单 ============ -->
+    <section id="view-new" class="view active">
+      <div class="card">
+        <div class="card-head">
+          <h2>计费参数</h2>
+          <span class="hint">电费按自然月、水费按水表账单周期，分别计算</span>
+        </div>
+        <form id="bill-form" class="form-grid">
+          <div class="fee-box">
+            <div class="fee-box-head">
+              <strong>电费</strong>
+            </div>
+            <label class="field">
+              <span>电费期间开始</span>
+              <input type="date" name="electric_period_start" id="electric_period_start" required />
+            </label>
+            <label class="field">
+              <span>电费期间结束</span>
+              <input type="date" name="electric_period_end" id="electric_period_end" required />
+            </label>
+            <label class="field">
+              <span>电费总额（元）</span>
+              <input type="number" name="electric_total" id="electric_total" min="0" step="0.01" placeholder="0.00" value="0" />
+            </label>
+            <label class="field">
+              <span>分摊方式</span>
+              <select name="electric_mode" id="electric_mode">
+                <option value="room-days" selected>按房间系数 × 在住天数（电费默认）</option>
+                <option value="person-days">按人天（人数 × 在住天数）</option>
+                <option value="persons">按人数</option>
+                <option value="manual">手动填写系数</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="fee-box">
+            <div class="fee-box-head">
+              <strong>水费</strong>
+            </div>
+            <label class="field">
+              <span>水费期间开始</span>
+              <input type="date" name="water_period_start" id="water_period_start" required />
+            </label>
+            <label class="field">
+              <span>水费期间结束</span>
+              <input type="date" name="water_period_end" id="water_period_end" required />
+            </label>
+            <label class="field">
+              <span>水费总额（元）</span>
+              <input type="number" name="water_total" id="water_total" min="0" step="0.01" placeholder="0.00" value="0" />
+            </label>
+            <label class="field">
+              <span>分摊方式</span>
+              <select name="water_mode" id="water_mode">
+                <option value="person-days" selected>按人天（入住人数 × 在住天数，水费默认）</option>
+                <option value="room-days">按房间系数 × 在住天数</option>
+                <option value="persons">按人数</option>
+                <option value="manual">手动填写系数</option>
+              </select>
+            </label>
+          </div>
+
+          <label class="field wide">
+            <span>备注</span>
+            <input type="text" name="note" id="bill-note" placeholder="可填写本期特殊情况，例如：7月10号走了，7月16号到" />
+          </label>
+
+          <div class="actions wide">
+            <button type="button" class="btn primary" id="btn-preview">计算预览</button>
+            <button type="button" class="btn ghost" id="btn-reset-form">重置</button>
+            <button type="button" class="btn ghost" id="btn-fill-example" title="填入一组示例金额，快速试算">填入示例金额</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card" id="preview-card" hidden>
+        <div class="card-head">
+          <h2>分摊预览</h2>
+          <div class="head-actions">
+            <button class="btn ghost small" id="btn-save-draft">存为草稿</button>
+            <button class="btn primary" id="btn-save-bill">保存账单</button>
+          </div>
+        </div>
+        <div id="preview-summary" class="summary-grid"></div>
+        <div id="preview-warnings" class="warnings"></div>
+        <div id="preview-tables"></div>
+        <div id="preview-footer" class="preview-footer"></div>
+      </div>
+    </section>
+
+    <!-- ============ 历史账单 ============ -->
+    <section id="view-bills" class="view">
+      <div class="card">
+        <div class="card-head">
+          <h2>历史账单</h2>
+          <button class="btn ghost small" id="btn-refresh-bills">刷新</button>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="bills-table"></table>
+        </div>
+        <p class="empty" id="bills-empty" hidden>还没有账单。到「新建账单」录入本期电费、水费总额即可生成。</p>
+      </div>
+    </section>
+
+    <!-- ============ 房间与人员 ============ -->
+    <section id="view-rooms" class="view">
+      <div class="card">
+        <div class="card-head">
+          <h2>房间</h2>
+          <div class="head-actions">
+            <span class="hint">电费系数：正常房间 1、商户 0（独立电表）；水费默认按入住人数</span>
+            <button class="btn primary small" id="btn-add-room">+ 新增房间</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="rooms-table"></table>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>人员</h2>
+          <div class="head-actions">
+            <select id="tenant-filter" class="select-inline">
+              <option value="">全部房间</option>
+            </select>
+            <button class="btn primary small" id="btn-add-tenant">+ 新增人员</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table class="data-table" id="tenants-table"></table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 离住记录总览 ============ -->
+    <section id="view-absences" class="view">
+      <div class="card">
+        <div class="card-head">
+          <h2>离住记录（全揽）</h2>
+          <div class="head-actions">
+            <button class="btn ghost small" id="btn-open-public">打开登记链接</button>
+            <button class="btn ghost small" id="btn-refresh-absences">刷新</button>
+          </div>
+        </div>
+        <div class="filter-row">
+          <label class="field">
+            <span>开始日期</span>
+            <input type="date" id="absence-start" />
+          </label>
+          <label class="field">
+            <span>结束日期</span>
+            <input type="date" id="absence-end" />
+          </label>
+          <label class="field">
+            <span>房间</span>
+            <select id="absence-room"><option value="">全部房间</option></select>
+          </label>
+          <div class="quick-ranges">
+            <button class="btn ghost small" data-range="3m">最近三个月</button>
+            <button class="btn ghost small" data-range="year">今年</button>
+            <button class="btn ghost small" data-range="all">全部</button>
+          </div>
+        </div>
+        <div class="table-wrap" id="absences-wrap">
+          <table class="data-table" id="absences-table"></table>
+        </div>
+        <div class="empty-tip" id="absences-empty" hidden>这段时间没有离住记录</div>
+      </div>
+    </section>
+  </main>
+
+  <!-- 弹窗 -->
+  <div class="modal-mask" id="modal-mask" hidden>
+    <div class="modal" id="modal">
+      <div class="modal-head">
+        <h3 id="modal-title">编辑</h3>
+        <button class="icon-btn" id="modal-close" aria-label="关闭">✕</button>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-foot" id="modal-foot"></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast" hidden></div>
+
+  <script src="app.js?v=20261021e"></script>
+</body>
+</html>

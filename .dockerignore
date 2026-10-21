@@ -1,0 +1,11 @@
+node_modules
+data
+test
+tools
+docs
+.git
+.gitignore
+*.xlsx
+*.log
+README.md
+docker-compose.yml

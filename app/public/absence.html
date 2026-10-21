@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>离住记录登记</title>
+  <link rel="stylesheet" href="style.css?v=20261021g" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+</head>
+<body class="auth-body">
+  <main class="auth-main">
+    <div class="public-stack">
+    <div class="card auth-card public-card">
+      <div class="brand auth-brand">
+        <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40" role="img" aria-label="房租水电费计算">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/>
+      <stop offset="0.52" stop-color="#111c33"/>
+      <stop offset="1" stop-color="#1f2a5e"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="0.45" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a5f3fc"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.22" cy="0.12" r="0.9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.6" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="11" fill="url(#tile)"/>
+  <rect width="40" height="40" rx="11" fill="url(#glow)"/>
+  <rect x="0.6" y="0.6" width="38.8" height="38.8" rx="10.5" fill="none" stroke="url(#edge)" stroke-width="0.8"/>
+  <path d="M8.6 19.6 20 9.8l11.4 9.8" fill="none" stroke="#eef3ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.4 19.6v10.6M28.6 19.6v10.6M11.4 30.2h17.2" fill="none" stroke="#c9d6f2" stroke-width="1.7" stroke-linecap="round" opacity="0.72"/>
+  <path transform="translate(0.4 0)" d="M21.3 14.3 15.9 21.6h3.4l-1.4 5.4 5.6-8.1h-3.5l1.3-4.6z" fill="url(#bolt)"/>
+  <path transform="translate(0.4 0.3)" d="M28.9 22.1c2.2 2.9 3.2 4.7 3.2 6a3.2 3.2 0 0 1-6.4 0c0-1.3 1-3.1 3.2-6z" fill="url(#drop)"/>
+        </svg></span>
+        <div>
+          <h1>离住记录登记</h1>
+          <p class="sub">回家 / 暂离时在这里登记，房东核对账单时会自动扣减</p>
+        </div>
+      </div>
+
+      <form id="absence-form" class="form-grid public-form">
+        <label class="field">
+          <span>房间 *</span>
+          <select id="pa-room" required></select>
+        </label>
+        <label class="field">
+          <span>住户 *</span>
+          <select id="pa-tenant" required></select>
+        </label>
+        <label class="field">
+          <span>开始日期 *</span>
+          <input type="date" id="pa-start" required />
+        </label>
+        <label class="field">
+          <span>结束日期 *</span>
+          <input type="date" id="pa-end" required />
+        </label>
+        <label class="field wide">
+          <span>备注</span>
+          <input type="text" id="pa-note" maxlength="50" placeholder="例如：回老家、出差" />
+        </label>
+        <div class="public-actions">
+          <button type="submit" class="btn primary" id="pa-submit">提交登记</button>
+          <span class="hint" id="pa-msg"></span>
+        </div>
+      </form>
+
+      <div class="public-success" id="pa-success" hidden></div>
+    </div>
+
+    <div class="card auth-card public-card">
+      <div class="card-head">
+        <h2>近期费用查询</h2>
+        <span class="hint">最近 6 份账单（无需密码）</span>
+      </div>
+      <div class="public-bills" id="pb-list"><p class="muted">加载中…</p></div>
+      <div class="auth-links">
+        <a href="/">返回首页</a>
+      </div>
+    </div>
+    </div>
+  </main>
+  <script src="absence.js?v=20261021g"></script>
+</body>
+</html>

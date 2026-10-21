@@ -1,0 +1,28 @@
+services:
+  billing:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: rent-utility-billing:1.0.0
+    container_name: rent-utility-billing
+    restart: unless-stopped
+    ports:
+      - "8787:8787"
+    environment:
+      TZ: Asia/Shanghai
+      # 需要密码保护时取消下面两行注释（浏览器会弹出登录框）
+      # APP_USER: admin
+      # APP_PASSWORD: change-me
+    volumes:
+      # 账单数据库保存在宿主机 ./data 目录，删容器不丢数据
+      - ./data:/data
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "fetch('http://127.0.0.1:8787/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

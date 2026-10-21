@@ -1,0 +1,29 @@
+{
+  "name": "rent-utility-billing",
+  "version": "1.1.0",
+  "private": true,
+  "description": "本地房租水电费分摊计算服务：电费/水费分开、按系数×天数与人天分摊，带访问密码、备份恢复、公开离住登记与近期账单查询（Node 内置 http + node:sqlite，零运行时依赖）",
+  "type": "commonjs",
+  "main": "app/server.js",
+  "engines": {
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node app/server.js",
+    "dev": "node --watch app/server.js",
+    "test": "node --test \"test/*.test.js\"",
+    "test:ui": "node tools/ui-smoke.mjs",
+    "reset": "node app/server.js --reset"
+  },
+  "license": "MIT",
+  "keywords": [
+    "billing",
+    "rent",
+    "utility",
+    "sqlite",
+    "nodejs",
+    "self-hosted",
+    "local-first"
+  ],
+  "author": ""
+}

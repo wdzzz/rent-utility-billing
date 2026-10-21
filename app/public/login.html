@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>登录 · 房租水电费计算</title>
+  <link rel="stylesheet" href="style.css?v=20261021g" />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+</head>
+<body class="auth-body">
+  <main class="auth-main">
+    <div class="card auth-card">
+      <div class="brand auth-brand">
+        <span class="brand-icon" aria-hidden="true"><svg viewBox="0 0 40 40" role="img" aria-label="房租水电费计算">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0a1020"/>
+      <stop offset="0.52" stop-color="#111c33"/>
+      <stop offset="1" stop-color="#1f2a5e"/>
+    </linearGradient>
+    <linearGradient id="bolt" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#fef3c7"/>
+      <stop offset="0.45" stop-color="#fbbf24"/>
+      <stop offset="1" stop-color="#f59e0b"/>
+    </linearGradient>
+    <linearGradient id="drop" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#a5f3fc"/>
+      <stop offset="1" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.22" cy="0.12" r="0.9">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.22"/>
+      <stop offset="0.6" stop-color="#ffffff" stop-opacity="0.04"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+      <stop offset="1" stop-color="#ffffff" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+  <rect width="40" height="40" rx="11" fill="url(#tile)"/>
+  <rect width="40" height="40" rx="11" fill="url(#glow)"/>
+  <rect x="0.6" y="0.6" width="38.8" height="38.8" rx="10.5" fill="none" stroke="url(#edge)" stroke-width="0.8"/>
+  <path d="M8.6 19.6 20 9.8l11.4 9.8" fill="none" stroke="#eef3ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M11.4 19.6v10.6M28.6 19.6v10.6M11.4 30.2h17.2" fill="none" stroke="#c9d6f2" stroke-width="1.7" stroke-linecap="round" opacity="0.72"/>
+  <path transform="translate(0.4 0)" d="M21.3 14.3 15.9 21.6h3.4l-1.4 5.4 5.6-8.1h-3.5l1.3-4.6z" fill="url(#bolt)"/>
+  <path transform="translate(0.4 0.3)" d="M28.9 22.1c2.2 2.9 3.2 4.7 3.2 6a3.2 3.2 0 0 1-6.4 0c0-1.3 1-3.1 3.2-6z" fill="url(#drop)"/>
+        </svg></span>
+        <div>
+          <h1>房租水电费计算</h1>
+          <p class="sub">按房间系数分摊 · 本地运行 · 数据存本地</p>
+        </div>
+      </div>
+      <h2 id="auth-title" class="auth-title">输入访问密码</h2>
+      <p class="auth-desc" id="auth-desc">请输入访问密码进入系统。</p>
+      <form id="auth-form" class="auth-form">
+        <label class="field">
+          <span>访问密码</span>
+          <input type="password" name="password" id="auth-password" autocomplete="current-password" required minlength="4" maxlength="64" placeholder="请输入密码" />
+        </label>
+        <label class="field" id="confirm-field" hidden>
+          <span>确认密码</span>
+          <input type="password" name="confirm" id="auth-confirm" autocomplete="new-password" minlength="4" maxlength="64" placeholder="再输一次" />
+        </label>
+        <div class="auth-error" id="auth-error" hidden></div>
+        <button type="submit" class="btn primary auth-submit" id="auth-submit">进入系统</button>
+      </form>
+      <div class="auth-links">
+        <a href="/absence">离住记录登记（无需密码）</a>
+      </div>
+    </div>
+  </main>
+  <script src="login.js?v=20261021e"></script>
+</body>
+</html>
