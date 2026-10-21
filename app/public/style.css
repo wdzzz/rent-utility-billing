@@ -577,3 +577,10 @@ main { max-width: 1240px; margin: 0 auto; padding: 20px 22px 60px; }
 
 /* 备注类文本允许换行（其余单元格保持单行，避免手机端行高异常） */
 .data-table td.muted { white-space: normal; }
+
+/* ---------- 离住记录：每条一行 ---------- */
+.abs-line { display: block; margin: 3px 0; line-height: 1.55; }
+.abs-line .chip { white-space: normal; }
+.data-table td.abs-cell { white-space: normal; }
+.public-bill .abs-line:first-child { margin-top: 0; }
+.public-bill .abs-line:last-child { margin-bottom: 0; }

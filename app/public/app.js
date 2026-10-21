@@ -745,7 +745,7 @@ function renderFeeTable(fee, opts = {}) {
         );
       }
     }
-    return lines.join(' ') || '<span class="muted">无离住记录</span>';
+    return lines.map((l) => `<div class="abs-line">${l}</div>`).join('') || '<span class="muted">无离住记录</span>';
   };
   const rows = (fee.items || [])
     .map((item) => {

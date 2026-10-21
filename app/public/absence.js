@@ -21,14 +21,15 @@ function shortDate(d) {
 function absenceText(room) {
   const list = room.absences || [];
   if (!list.length) return '<span class="muted">无离住记录</span>';
+  // 每条离住记录单独一行，避免多段记录挤在一起
   return list
     .map((a) => {
       const range = a.start ? `${shortDate(a.start)} ~ ${shortDate(a.end)}` : '回老家';
-      return `<span class="chip gray">${escapeHtml(a.name)}：${range}（${a.days}天）${
-        a.note ? ' ' + escapeHtml(a.note) : ''
-      }</span>`;
+      return `<div class="abs-line"><span class="chip gray">${escapeHtml(a.name)}：${range}（${
+        a.days
+      }天）${a.note ? ' ' + escapeHtml(a.note) : ''}</span></div>`;
     })
-    .join(' ');
+    .join('');
 }
 
 function yuan(cents) {
@@ -149,7 +150,7 @@ function renderBills(bills) {
                 (r) => `<tr>
                   <td class="room-cell">${escapeHtml(r.room_no)}</td>
                   <td class="num">${yuan(r.amount_cents)}</td>
-                  <td>${absenceText(r)}</td>
+                  <td class="abs-cell">${absenceText(r)}</td>
                 </tr>`
               )
               .join('') || '<tr><td colspan="3" class="muted">暂无房间明细</td></tr>'
