@@ -28,8 +28,8 @@
 ## 快速开始
 
 ```bash
-git clone <你的仓库地址> rent-billing
-cd rent-billing
+git clone https://github.com/wdzzz/rent-utility-billing.git
+cd rent-utility-billing
 node -v                 # 需要 Node >= 22.5（推荐 24，内置 node:sqlite）
 ./scripts/start.sh      # 后台启动：http://localhost:8787
 ```

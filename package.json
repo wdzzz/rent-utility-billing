@@ -25,5 +25,13 @@
     "self-hosted",
     "local-first"
   ],
-  "author": ""
+  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wdzzz/rent-utility-billing.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wdzzz/rent-utility-billing/issues"
+  },
+  "homepage": "https://github.com/wdzzz/rent-utility-billing#readme"
 }
